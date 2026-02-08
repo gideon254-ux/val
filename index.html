@@ -1,0 +1,831 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Valentine Surprise</title>
+<style>
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    overflow: hidden;
+    background: #ffe6f0;
+  }
+
+  /* --- Gift Cover --- */
+  #zipper-cover {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    background: linear-gradient(135deg, #ffccd9 0%, #ffa6c1 100%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    z-index: 300;
+    overflow: hidden;
+  }
+
+  /* Floating hearts background */
+  .bg-heart {
+    position: absolute;
+    font-size: 30px;
+    opacity: 0.15;
+    animation: floatBackground 15s infinite ease-in-out;
+  }
+
+  @keyframes floatBackground {
+    0%, 100% {
+      transform: translateY(0) rotate(0deg);
+    }
+    50% {
+      transform: translateY(-30px) rotate(10deg);
+    }
+  }
+
+  #gift-container {
+    text-align: center;
+    animation: fadeIn 1s ease-in;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: scale(0.8);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  .gift-tag {
+    background: white;
+    padding: 15px 30px;
+    border-radius: 50px;
+    margin-bottom: 30px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+    display: inline-block;
+    animation: swing 3s ease-in-out infinite;
+  }
+
+  @keyframes swing {
+    0%, 100% {
+      transform: rotate(-3deg);
+    }
+    50% {
+      transform: rotate(3deg);
+    }
+  }
+
+  .gift-tag-text {
+    font-size: 1.5em;
+    color: #ff3366;
+    font-weight: bold;
+    font-style: italic;
+  }
+
+  .gift-tag::before {
+    content: '🎁';
+    margin-right: 10px;
+    font-size: 1.2em;
+  }
+
+  #gift-box {
+    position: relative;
+    width: 280px;
+    padding: 40px 60px;
+    background: linear-gradient(145deg, #ff3333, #cc0000);
+    border-radius: 25px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 20px 50px rgba(255,0,0,0.5);
+    animation: pulse 2s ease-in-out infinite;
+  }
+
+  /* Ribbon on gift box */
+  #gift-box::before {
+    content: '';
+    position: absolute;
+    top: -15px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(145deg, #ffd700, #ffaa00);
+    border-radius: 50%;
+    box-shadow: 0 5px 15px rgba(255,215,0,0.5);
+  }
+
+  #gift-box::after {
+    content: '🎀';
+    position: absolute;
+    top: -25px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 35px;
+    animation: bowBounce 2s ease-in-out infinite;
+  }
+
+  @keyframes bowBounce {
+    0%, 100% {
+      transform: translateX(-50%) translateY(0);
+    }
+    50% {
+      transform: translateX(-50%) translateY(-5px);
+    }
+  }
+
+  @keyframes pulse {
+    0%, 100% {
+      transform: scale(1);
+      box-shadow: 0 20px 50px rgba(255,0,0,0.5);
+    }
+    50% {
+      transform: scale(1.05);
+      box-shadow: 0 25px 60px rgba(255,0,0,0.7);
+    }
+  }
+
+  #open-button {
+    padding: 22px 45px;
+    font-size: 1.8em;
+    font-weight: bold;
+    background: linear-gradient(145deg, #ff0000, #cc0000);
+    border: 3px solid white;
+    border-radius: 15px;
+    color: white;
+    cursor: pointer;
+    box-shadow: 0 6px 15px rgba(0,0,0,0.3);
+    transition: all 0.3s;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    position: relative;
+    overflow: hidden;
+  }
+
+  #open-button::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.3);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+  }
+
+  #open-button:hover::before {
+    width: 300px;
+    height: 300px;
+  }
+
+  #open-button:hover {
+    transform: scale(1.1) rotate(-2deg);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+    border-color: #ffd700;
+  }
+
+  #open-button:active {
+    transform: scale(0.95);
+  }
+
+  #open-button span {
+    position: relative;
+    z-index: 1;
+  }
+
+  /* --- Main Valentine Page --- */
+  #main-content {
+    display: none;
+    position: relative;
+    height: 100vh;
+    overflow: hidden;
+    background: linear-gradient(135deg, #ffe6f0 0%, #ffd1e3 100%);
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    padding-top: 80px;
+  }
+
+  h1 {
+    color: #ff3366;
+    margin-bottom: 40px;
+    font-size: 3em;
+    z-index: 10;
+    position: relative;
+    transition: all 0.3s;
+    text-shadow: 2px 2px 4px rgba(255,51,102,0.2);
+    animation: fadeInDown 0.8s ease;
+  }
+
+  @keyframes fadeInDown {
+    from {
+      opacity: 0;
+      transform: translateY(-30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  #romantic-text {
+    font-size: 1.8em;
+    margin: 30px auto;
+    color: #ff1a75;
+    max-width: 85%;
+    line-height: 1.8;
+    min-height: 100px;
+    text-align: center;
+    font-weight: 500;
+    text-shadow: 1px 1px 2px rgba(255,26,117,0.1);
+    z-index: 10;
+    position: relative;
+  }
+
+  /* Music control button */
+  .music-control {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(145deg, #ff6699, #ff3377);
+    border-radius: 50%;
+    border: 3px solid white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    box-shadow: 0 5px 15px rgba(255,51,102,0.4);
+    transition: all 0.3s;
+    z-index: 1000;
+    animation: musicPulse 2s ease-in-out infinite;
+  }
+
+  .music-control:hover {
+    transform: scale(1.1);
+    box-shadow: 0 8px 20px rgba(255,51,102,0.6);
+  }
+
+  @keyframes musicPulse {
+    0%, 100% {
+      box-shadow: 0 5px 15px rgba(255,51,102,0.4);
+    }
+    50% {
+      box-shadow: 0 8px 25px rgba(255,51,102,0.7);
+    }
+  }
+
+  .music-control.playing {
+    animation: musicPulse 1s ease-in-out infinite, spin 3s linear infinite;
+  }
+
+  @keyframes spin {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    background: white;
+    border-radius: 50%;
+    animation: sparkleAnim 2s ease-in-out infinite;
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  @keyframes sparkleAnim {
+    0%, 100% {
+      opacity: 0;
+      transform: scale(0);
+    }
+    50% {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  .button-container {
+    position: relative;
+    z-index: 10;
+    margin-top: 30px;
+    width: 500px;
+    height: 100px;
+  }
+
+  button {
+    padding: 18px 50px;
+    font-size: 1.4em;
+    font-weight: bold;
+    border: none;
+    border-radius: 15px;
+    cursor: pointer;
+    position: absolute;
+    transition: all 0.2s ease;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+  }
+
+  button:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+  }
+
+  #yes {
+    background: linear-gradient(145deg, #ff6699, #ff3377);
+    color: white;
+    left: 50px;
+    top: 20px;
+  }
+
+  #no {
+    background: linear-gradient(145deg, #ffccff, #ffaaee);
+    color: #333;
+    right: 50px;
+    top: 20px;
+  }
+
+  .emoji {
+    position: absolute;
+    font-size: 28px;
+    pointer-events: none;
+    animation: floatUp linear forwards;
+    z-index: 5;
+  }
+
+  @keyframes floatUp {
+    0% {
+      transform: translateY(0) rotate(0deg) scale(1);
+      opacity: 1;
+    }
+    50% {
+      transform: translateY(-60vh) rotate(180deg) scale(1.2);
+      opacity: 1;
+    }
+    100% {
+      transform: translateY(-120vh) rotate(360deg) scale(0.8);
+      opacity: 0;
+    }
+  }
+
+  .flower {
+    position: absolute;
+    font-size: 35px;
+    opacity: 0;
+    animation: fall linear forwards;
+    pointer-events: none;
+    z-index: 5;
+  }
+
+  @keyframes fall {
+    0% {
+      transform: translateY(-80px) scale(0.3) rotate(0deg);
+      opacity: 0;
+    }
+    15% {
+      opacity: 1;
+    }
+    100% {
+      transform: translateY(110vh) scale(1.2) rotate(720deg);
+      opacity: 0.9;
+    }
+  }
+
+  /* Final message */
+  #final-message {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(255, 255, 255, 0.95);
+    padding: 50px 70px;
+    border-radius: 25px;
+    box-shadow: 0 20px 60px rgba(255,51,102,0.5);
+    text-align: center;
+    display: none;
+    z-index: 100;
+    animation: fadeInScale 1s ease-out;
+    border: 3px solid #ff3366;
+  }
+
+  @keyframes fadeInScale {
+    from {
+      opacity: 0;
+      transform: translate(-50%, -50%) scale(0.8);
+    }
+    to {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1);
+    }
+  }
+
+  #final-message h2 {
+    color: #ff3366;
+    font-size: 2.5em;
+    margin-bottom: 20px;
+    animation: heartbeat 1.5s ease-in-out infinite;
+  }
+
+  @keyframes heartbeat {
+    0%, 100% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(1.05);
+    }
+  }
+
+  #final-message p {
+    color: #ff1a75;
+    font-size: 1.5em;
+    font-weight: 500;
+  }
+
+  /* Mobile responsiveness */
+  @media (max-width: 768px) {
+    h1 {
+      font-size: 2em;
+    }
+    
+    #romantic-text {
+      font-size: 1.3em;
+      max-width: 90%;
+    }
+    
+    .button-container {
+      width: 100%;
+    }
+    
+    button {
+      padding: 15px 30px;
+      font-size: 1.2em;
+    }
+    
+    #zipper {
+      width: 60px;
+      height: 160px;
+    }
+  }
+</style>
+</head>
+<body>
+
+<!-- Music Control Button -->
+<button class="music-control" id="music-toggle" title="Toggle Music">
+  🎵
+</button>
+
+<!-- Audio Element -->
+<audio id="bg-music" loop>
+  <source src="music.mp4" type="audio/mp4">
+  <source src="music.mp3" type="audio/mpeg">
+</audio>
+
+<!-- Gift Cover -->
+<div id="zipper-cover">
+  <!-- Floating background hearts -->
+  <div class="bg-heart" style="top: 10%; left: 10%;">💕</div>
+  <div class="bg-heart" style="top: 20%; right: 15%; animation-delay: 2s;">❤️</div>
+  <div class="bg-heart" style="bottom: 15%; left: 20%; animation-delay: 4s;">💖</div>
+  <div class="bg-heart" style="bottom: 25%; right: 10%; animation-delay: 6s;">💗</div>
+  <div class="bg-heart" style="top: 50%; left: 5%; animation-delay: 3s;">💝</div>
+  <div class="bg-heart" style="top: 60%; right: 8%; animation-delay: 5s;">💘</div>
+  
+  <div id="gift-container">
+    <div class="gift-tag">
+      <span class="gift-tag-text">A Gift from G</span>
+    </div>
+    <div id="gift-box">
+      <button id="open-button"><span>Click Me!</span></button>
+    </div>
+  </div>
+</div>
+
+<!-- Main Valentine Content -->
+<div id="main-content">
+  <h1 id="heading">Will you be my Valentine? 💖</h1>
+  <div id="romantic-text"></div>
+  <div class="button-container">
+    <button id="yes">Yes</button>
+    <button id="no">No</button>
+  </div>
+</div>
+
+<!-- Final Message -->
+<div id="final-message">
+  <h2>Call me ML 💖</h2>
+  <p>I'm waiting... 📞</p>
+</div>
+
+<script>
+/* --- Background Music Control --- */
+const bgMusic = document.getElementById('bg-music');
+const musicToggle = document.getElementById('music-toggle');
+let isMusicPlaying = false;
+
+// Set volume to a comfortable level
+bgMusic.volume = 0.3;
+
+musicToggle.addEventListener('click', () => {
+  if (isMusicPlaying) {
+    bgMusic.pause();
+    musicToggle.textContent = '🎵';
+    musicToggle.classList.remove('playing');
+    isMusicPlaying = false;
+  } else {
+    bgMusic.play().catch(e => {
+      console.log('Music play failed:', e);
+    });
+    musicToggle.textContent = '🎶';
+    musicToggle.classList.add('playing');
+    isMusicPlaying = true;
+  }
+});
+
+// Auto-play attempt (may be blocked by browser)
+document.addEventListener('click', () => {
+  if (!isMusicPlaying) {
+    bgMusic.play().catch(e => console.log('Auto-play blocked'));
+    musicToggle.textContent = '🎶';
+    musicToggle.classList.add('playing');
+    isMusicPlaying = true;
+  }
+}, { once: true });
+
+/* --- Create sparkles on the cover page --- */
+function createSparkles() {
+  setInterval(() => {
+    const sparkle = document.createElement('div');
+    sparkle.className = 'sparkle';
+    sparkle.style.left = Math.random() * 100 + '%';
+    sparkle.style.top = Math.random() * 100 + '%';
+    sparkle.style.animationDelay = Math.random() * 2 + 's';
+    document.getElementById('zipper-cover').appendChild(sparkle);
+    
+    setTimeout(() => sparkle.remove(), 2000);
+  }, 300);
+}
+
+createSparkles();
+
+/* --- Open Button --- */
+const openButton = document.getElementById('open-button');
+const zipperCover = document.getElementById('zipper-cover');
+const mainContent = document.getElementById('main-content');
+
+openButton.addEventListener('click', () => {
+  zipperCover.style.display = 'none';
+  mainContent.style.display = 'flex';
+  startValentine();
+});
+
+/* --- Valentine Game Logic --- */
+function startValentine() {
+  const noBtn = document.getElementById('no');
+  const yesBtn = document.getElementById('yes');
+  const bodyEl = document.body;
+  const heading = document.getElementById('heading');
+  const romanticText = document.getElementById('romantic-text');
+
+  const originalNoStyle = {
+    right: '50px',
+    top: '20px',
+    left: 'auto'
+  };
+
+  let hoverCounter = 0;
+  let emojiInterval;
+  let flowerInterval;
+
+  /* --- No button dodging --- */
+  let lastMoveTime = Date.now();
+  let resetNoButtonTimeout;
+  let isButtonMoving = false;
+
+  document.addEventListener('mousemove', (e) => {
+    lastMoveTime = Date.now();
+    
+    const noBtnRect = noBtn.getBoundingClientRect();
+    const noBtnCenterX = noBtnRect.left + noBtnRect.width / 2;
+    const noBtnCenterY = noBtnRect.top + noBtnRect.height / 2;
+    
+    const distance = Math.sqrt(
+      Math.pow(e.clientX - noBtnCenterX, 2) +
+      Math.pow(e.clientY - noBtnCenterY, 2)
+    );
+    
+    // If cursor is within 100px of the No button, move it away
+    if (distance < 100) {
+      isButtonMoving = true;
+      const angle = Math.atan2(noBtnCenterY - e.clientY, noBtnCenterX - e.clientX);
+      const moveDistance = 180;
+      
+      let newX = noBtnCenterX + Math.cos(angle) * moveDistance - noBtnRect.width / 2;
+      let newY = noBtnCenterY + Math.sin(angle) * moveDistance - noBtnRect.height / 2;
+      
+      // Keep within viewport bounds
+      const maxX = window.innerWidth - noBtnRect.width - 20;
+      const maxY = window.innerHeight - noBtnRect.height - 20;
+      
+      newX = Math.max(20, Math.min(newX, maxX));
+      newY = Math.max(20, Math.min(newY, maxY));
+      
+      noBtn.style.left = newX + 'px';
+      noBtn.style.top = newY + 'px';
+      noBtn.style.right = 'auto';
+      
+      hoverCounter++;
+      
+      if (hoverCounter === 5) {
+        heading.textContent = "Stop messing around and click YES! 💖";
+        heading.style.color = '#ff0066';
+      } else if (hoverCounter === 10) {
+        heading.textContent = "I do not take NO for an answer! 💖";
+        heading.style.color = '#cc0033';
+      }
+      
+      // Return to original position immediately after moving
+      clearTimeout(resetNoButtonTimeout);
+      resetNoButtonTimeout = setTimeout(() => {
+        noBtn.style.left = 'auto';
+        noBtn.style.right = originalNoStyle.right;
+        noBtn.style.top = originalNoStyle.top;
+        isButtonMoving = false;
+      }, 300);
+    }
+  });
+
+  /* --- Touch support for mobile --- */
+  let touchMoveTimeout;
+  
+  document.addEventListener('touchmove', (e) => {
+    const touch = e.touches[0];
+    const noBtnRect = noBtn.getBoundingClientRect();
+    const noBtnCenterX = noBtnRect.left + noBtnRect.width / 2;
+    const noBtnCenterY = noBtnRect.top + noBtnRect.height / 2;
+    
+    const distance = Math.sqrt(
+      Math.pow(touch.clientX - noBtnCenterX, 2) +
+      Math.pow(touch.clientY - noBtnCenterY, 2)
+    );
+    
+    if (distance < 100) {
+      e.preventDefault();
+      
+      const angle = Math.atan2(noBtnCenterY - touch.clientY, noBtnCenterX - touch.clientX);
+      const moveDistance = 180;
+      
+      let newX = noBtnCenterX + Math.cos(angle) * moveDistance - noBtnRect.width / 2;
+      let newY = noBtnCenterY + Math.sin(angle) * moveDistance - noBtnRect.height / 2;
+      
+      const maxX = window.innerWidth - noBtnRect.width - 20;
+      const maxY = window.innerHeight - noBtnRect.height - 20;
+      
+      newX = Math.max(20, Math.min(newX, maxX));
+      newY = Math.max(20, Math.min(newY, maxY));
+      
+      noBtn.style.left = newX + 'px';
+      noBtn.style.top = newY + 'px';
+      noBtn.style.right = 'auto';
+      
+      hoverCounter++;
+      
+      if (hoverCounter === 5) {
+        heading.textContent = "Stop messing around and click YES! 💖";
+      } else if (hoverCounter === 10) {
+        heading.textContent = "I do not take NO for an answer! 💖";
+      }
+      
+      // Return to original position immediately after moving
+      clearTimeout(touchMoveTimeout);
+      touchMoveTimeout = setTimeout(() => {
+        noBtn.style.left = 'auto';
+        noBtn.style.right = originalNoStyle.right;
+        noBtn.style.top = originalNoStyle.top;
+      }, 300);
+    }
+  }, { passive: false });
+
+  /* --- Sentences --- */
+  const sentences = [
+    "From the moment I met you 💕, my heart knew it had found its home 🏡",
+    "Every time I see you 😍, the world becomes brighter ✨",
+    "Your smile 🌞 is my favorite sunrise 🌅",
+    "I love the way your laughter 😂 fills the air with magic ✨",
+    "Being with you feels like a beautiful dream 🌙💖",
+    "You make ordinary moments unforgettable 🌸",
+    "I fall for you more with every heartbeat 💓",
+    "You are the reason I believe in love 💑",
+    "With you, forever doesn't seem long enough ⏰💕",
+    "I could not afford flowers so I coded some for you 💐"
+  ];
+
+  function typeSentence(sentence, callback) {
+    romanticText.textContent = "";
+    let i = 0;
+    
+    function typeLetter() {
+      if (i < sentence.length) {
+        romanticText.textContent += sentence.charAt(i);
+        i++;
+        setTimeout(typeLetter, 120);
+      } else if (callback) {
+        setTimeout(callback, 1500);
+      }
+    }
+    typeLetter();
+  }
+
+  function showSentences(index = 0) {
+    if (index >= sentences.length) {
+      showFinalBouquet();
+      return;
+    }
+    typeSentence(sentences[index], () => showSentences(index + 1));
+  }
+
+  /* --- Emojis --- */
+  function createEmoji() {
+    const emojis = ['💖','💘','🌹','😍','🥰','💕','💞','💓','❤️','💗'];
+    const emoji = document.createElement('div');
+    emoji.className = 'emoji';
+    emoji.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+    
+    const startX = Math.random() * window.innerWidth;
+    emoji.style.left = startX + 'px';
+    emoji.style.bottom = '0px';
+    emoji.style.fontSize = (24 + Math.random() * 20) + 'px';
+    emoji.style.animationDuration = (3 + Math.random() * 2) + 's';
+    
+    bodyEl.appendChild(emoji);
+    
+    setTimeout(() => emoji.remove(), 6000);
+  }
+
+  /* --- Flower Finale --- */
+  function createFlower() {
+    const flowers = ['🌹','🌸','🌺','💐','🌷','🌻','🏵️','🌼'];
+    const flower = document.createElement('div');
+    flower.className = 'flower';
+    flower.textContent = flowers[Math.floor(Math.random() * flowers.length)];
+    flower.style.left = Math.random() * window.innerWidth + 'px';
+    flower.style.top = '-80px';
+    flower.style.fontSize = (30 + Math.random() * 30) + 'px';
+    flower.style.animationDuration = (6 + Math.random() * 4) + 's';
+    
+    bodyEl.appendChild(flower);
+    
+    setTimeout(() => flower.remove(), 12000);
+  }
+
+  function showFinalBouquet() {
+    clearInterval(emojiInterval);
+    document.querySelectorAll('.emoji').forEach(e => e.remove());
+    romanticText.textContent = "";
+    heading.style.display = 'none';
+    
+    flowerInterval = setInterval(createFlower, 150);
+    
+    // Stop music when flower finale starts
+    bgMusic.pause();
+    musicToggle.textContent = '🎵';
+    musicToggle.classList.remove('playing');
+    isMusicPlaying = false;
+    
+    // Show final message after 5 seconds of flowers
+    setTimeout(() => {
+      document.getElementById('final-message').style.display = 'block';
+    }, 5000);
+  }
+
+  /* --- Yes Button --- */
+  yesBtn.addEventListener('click', () => {
+    yesBtn.style.display = 'none';
+    noBtn.style.display = 'none';
+    heading.textContent = "I knew you'd say yes! 💕";
+    
+    emojiInterval = setInterval(createEmoji, 80);
+    
+    setTimeout(() => {
+      showSentences();
+    }, 1500);
+  });
+}
+</script>
+</body>
+</html>
