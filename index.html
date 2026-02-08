@@ -492,8 +492,7 @@
 
 <!-- Audio Element -->
 <audio id="bg-music" loop>
-  <source src="music.mp4" type="audio/mp4">
-  <source src="music.mp3" type="audio/mpeg">
+  <source src="music.m4a" type="audio/mp4">
 </audio>
 
 <!-- Gift Cover -->
@@ -548,24 +547,33 @@ musicToggle.addEventListener('click', () => {
     musicToggle.classList.remove('playing');
     isMusicPlaying = false;
   } else {
-    bgMusic.play().catch(e => {
+    bgMusic.play().then(() => {
+      musicToggle.textContent = '🎶';
+      musicToggle.classList.add('playing');
+      isMusicPlaying = true;
+    }).catch(e => {
       console.log('Music play failed:', e);
+      alert('Click the music button (🎵) in the bottom right to play music!');
     });
-    musicToggle.textContent = '🎶';
-    musicToggle.classList.add('playing');
-    isMusicPlaying = true;
   }
 });
 
-// Auto-play attempt (may be blocked by browser)
-document.addEventListener('click', () => {
+// Try to play music on first user interaction
+function tryPlayMusic() {
   if (!isMusicPlaying) {
-    bgMusic.play().catch(e => console.log('Auto-play blocked'));
-    musicToggle.textContent = '🎶';
-    musicToggle.classList.add('playing');
-    isMusicPlaying = true;
+    bgMusic.play().then(() => {
+      musicToggle.textContent = '🎶';
+      musicToggle.classList.add('playing');
+      isMusicPlaying = true;
+    }).catch(e => {
+      console.log('Auto-play blocked, user needs to click music button');
+    });
   }
-}, { once: true });
+}
+
+// Attempt to play on any user interaction
+document.addEventListener('click', tryPlayMusic, { once: true });
+document.addEventListener('touchstart', tryPlayMusic, { once: true });
 
 /* --- Create sparkles on the cover page --- */
 function createSparkles() {
